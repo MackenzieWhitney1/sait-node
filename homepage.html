@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link id="styleToChange" rel="stylesheet" href="styles.css"></link>
+</head>
+<body onload="changeStyleByTime()">
+    <div class="topnav">
+        <a href="homepage.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="demo.html">Demo</a>
+    </div>
+    <h1>Welcome to the Home Page</h1>
+    <script>
+    function changeStyleByTime() {
+        const linkTag = document.getElementById("styleToChange");
+        const currentHour = new Date().getHours();
+        // const currentHour = 15;
+        console.log(currentHour);
+        linkTag.setAttribute("href", `${currentHour <= 12 ? "morning" : "evening"}.css`);
+    }
+    </script> 
+</body>
+</html>
