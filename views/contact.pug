@@ -3,3 +3,8 @@ extends layout.pug
 block content
   h1 My Contact Information
   p SAIT e-mail: mackenzie.whitney@sait.ca
+  form(action='/contact' method='POST')
+    input(name='author' placeholder='Your Name')
+    br
+    textarea(name='feedbackArea' rows='5' placeholder='Write your feedback here')
+    button(type='submit') Send

@@ -36,10 +36,18 @@ app.get("/login", (req, res) => {
     res.send("<form method='POST'><input type='text' name='username'/><input type='submit' /></form>"); 
 })
 
+app.get("/create-post", (req, res) => {
+    res.render("create-post", {title: "Create Post"});
+})
+
 app.post("/login", (req, res)=> {
     res.send("<h1>Login Processed</h1>");
 })
-
+app.use(express.urlencoded({ extended: true }));
+app.post("/contact", (req, res) => {
+    console.log(req.body);
+    res.redirect("/thank-you-for-feedback");
+});
 app.use(express.urlencoded({ extended: true }));
 app.post("/create-post", (req, res) => {
     res.redirect("/thank-you");
@@ -48,10 +56,11 @@ app.post("/create-post", (req, res) => {
 app.get("/thank-you", (req, res) => {
     res.send("Thank you for your post!"); 
 })
+app.get("/thank-you-for-feedback", (req, res) => {
+    res.send("Thank you for your feedback!"); 
+})
 
-// sendFile for non-static pages. render for static.
 app.get('/greet', (req, res) => {
-    // res.sendFile(`${__dirname}/greetingsPages/${greeting.randomGreeting()}.html`);
     res.render(`${__dirname}/greetingsPages/${greeting.randomGreeting()}`);
   });
 
