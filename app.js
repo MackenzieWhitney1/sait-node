@@ -10,8 +10,8 @@ var greeting = require("./greetings");
 moment().format(); 
 console.log(moment().format('MMM Do, YYYY'));
 
-app.set('view engine', 'html');
-
+app.set("views", path.join(__dirname, "views"));
+app.set('view engine', 'pug');
 app.listen(8000, ()=> {
     console.log(`Server is listening on port ${port}. Ready to accept requests`);
 });
@@ -24,7 +24,16 @@ app.post("/login", (req, res)=> {
     res.send("<h1>Login Processed</h1>");
 })
 
-// works with sendFile but not render? (which seems to require ejs)
+app.use(express.urlencoded({ extended: true }));
+app.post("/create-post", (req, res) => {
+    res.redirect("/thank-you");
+})
+
+app.get("/thank-you", (req, res) => {
+    res.send("Thank you for your post!"); 
+})
+
+// sendFile for non-static pages. render for static.
 app.get('/greet', (req, res) => {
     res.sendFile(`${__dirname}/greetingsPages/${greeting.randomGreeting()}.html`);
   });
