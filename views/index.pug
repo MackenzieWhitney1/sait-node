@@ -1,0 +1,7 @@
+extends layout.pug 
+
+block content
+    h1#title Home 
+    h2.subtitle This is our index page.
+    each greeting in greetings
+        p= greeting

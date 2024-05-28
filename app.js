@@ -16,6 +16,22 @@ app.listen(8000, ()=> {
     console.log(`Server is listening on port ${port}. Ready to accept requests`);
 });
 
+app.get("/", (req, res) => {
+    res.render("index", { greetings: ["Hello", "Bonjour", "Hola", "Ciao"], title:"Index" } );
+    });
+app.get("/home", (req, res) => {
+    res.render("home", {title:"Home"});
+})
+app.get("/about", (req, res) => {
+    res.render("about", {title:"About"});
+});
+app.get("/contact", (req, res) => {
+    res.render("contact", {title:"Contact"});
+});
+app.get("/demo", (req, res) => {
+    res.render("demo", {title: "Demo"});
+});    
+
 app.get("/login", (req, res) => {
     res.send("<form method='POST'><input type='text' name='username'/><input type='submit' /></form>"); 
 })
@@ -35,14 +51,16 @@ app.get("/thank-you", (req, res) => {
 
 // sendFile for non-static pages. render for static.
 app.get('/greet', (req, res) => {
-    res.sendFile(`${__dirname}/greetingsPages/${greeting.randomGreeting()}.html`);
+    // res.sendFile(`${__dirname}/greetingsPages/${greeting.randomGreeting()}.html`);
+    res.render(`${__dirname}/greetingsPages/${greeting.randomGreeting()}`);
   });
 
-app.use(express.static(__dirname + '/views/', {
+/* app.use(express.static(__dirname + '/views/', {
     extensions: ["html"]
-}));
+})); */
 app.use(express.static(__dirname + '/public/'));
+app.use("/img", express.static("image_assets"));
 
 app.use((req, res, next) => {
-    res.status(404).send("Sorry, can't find that!");
+    res.status(404).render("errorPage");
 });
