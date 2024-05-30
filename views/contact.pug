@@ -8,3 +8,12 @@ block content
     br
     textarea(name='feedbackArea' rows='5' placeholder='Write your feedback here')
     button(type='submit') Send
+  table
+    tr
+      //-caution - breaks with empty set
+      each field in Object.keys(agents[0])
+        th= field 
+      each agent in agents 
+        tr 
+          each field in Object.keys(agent)
+            td= agent[field]

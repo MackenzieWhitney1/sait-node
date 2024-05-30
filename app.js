@@ -7,9 +7,34 @@ const app = express();
 const port = 8000;
 var moment = require('moment');
 var greeting = require("./greetings");
+var mysql = require('mysql');
 moment().format(); 
 console.log(moment().format('MMM Do, YYYY'));
 
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "travelexperts"
+    });
+/* con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+    var sql = "SELECT customers.CustFirstName, customers.CustLastName, bookings.BookingNo \
+    FROM customers JOIN bookings \
+    ON customers.CustomerId = bookings.CustomerId";
+    con.query(sql, function (err, result) {
+        if(err) throw err;
+        result.forEach(row => { 
+            console.log(JSON.stringify(row));
+        });
+        // console.log("Result: " + JSON.stringify(result));
+        con.end(function(err){
+            if(err) throw err;
+        })
+    })
+}); */
+        
 app.set("views", path.join(__dirname, "views"));
 app.set('view engine', 'pug');
 app.listen(8000, ()=> {
@@ -26,8 +51,19 @@ app.get("/about", (req, res) => {
     res.render("about", {title:"About"});
 });
 app.get("/contact", (req, res) => {
-    res.render("contact", {title:"Contact"});
-});
+    /* con.connect(function(err) {
+        if (err) throw err;
+        console.log("Connected!");
+ */        var sql = "SELECT * FROM agents";
+        con.query(sql, function (err, result) {
+            if(err) throw err;
+            // console.log("Result: " + JSON.stringify(result));
+            res.render("contact", {title:"Contact", agents: result});
+            /* con.end(function(err){
+                if(err) throw err;
+            }); */
+        })
+    });
 app.get("/demo", (req, res) => {
     res.render("demo", {title: "Demo"});
 });    
