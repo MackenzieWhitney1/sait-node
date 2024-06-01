@@ -1,0 +1,24 @@
+extends layout.pug 
+
+block content
+  form(action='/create-blog' method='POST')
+    label(for="blogTitle") Blog Title:
+    input(name='blogTitle')
+    br
+    label(for="blogPost") Blog Content:
+    textarea(name='blogPost' rows='5')
+    br
+    button(type='submit') Publish
+  table 
+    if data.length !== 0
+      each row in data 
+          tr 
+            each field in Object.keys(row)
+              td= row[field]
+            td 
+              button(type='submit' click='/update-blog' class="update-row-btn" data-id= row.blogID) Update
+            td 
+              button(type='submit' click='/delete/:id' class="delete-row-btn" data-id= row.blogID) Delete
+    else 
+      tr No blog posts found.
+

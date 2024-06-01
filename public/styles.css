@@ -21,3 +21,37 @@
   background-color: #04AA6D;
   color: white;
   }
+
+  input, textarea {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display:inline-block;
+    vertical-align:middle;
+    margin-left:20px
+}
+
+label {
+    display:inline-block;
+    padding-top: 5px;
+    text-align: right;
+    width: 140px;
+    font-size: 17px;
+}
+
+body.morning {
+  background-color: lightblue;
+  color:black;
+}
+body.evening {
+  background-color: darkcyan;
+  color: white;
+}
+
+table, th, td {
+  border-collapse: collapse;
+  border: 1px solid black;
+}
+
+th, td {
+  padding: 5px
+}

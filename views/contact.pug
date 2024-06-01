@@ -10,10 +10,9 @@ block content
     button(type='submit') Send
   table
     tr
-      //-caution - breaks with empty set
-      each field in Object.keys(agents[0])
-        th= field 
-      each agent in agents 
+      each column in columns
+        th= column 
+      each row in result 
         tr 
-          each field in Object.keys(agent)
-            td= agent[field]
+          each field in Object.keys(row)
+            td= row[field]

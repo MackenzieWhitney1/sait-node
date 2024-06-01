@@ -1,48 +1,41 @@
 const http = require("http");
 const fs = require("fs");
 const url = require("url");
-const express = require("express");
 const path = require("path");
+const express = require("express");
+const session = require("express-session");
 const app = express();
-const port = 8000;
-var moment = require('moment');
-var greeting = require("./greetings");
-var mysql = require('mysql');
+app.use(express.urlencoded({ extended: true }));
+const moment = require('moment');
+const greeting = require("./greetings");
+const dbService = require("./dbService");
+
+// needed so that when the API is called it will not be blocked?
+const cors = require('cors');
+app.use(cors());
+const dotenv = require('dotenv');
+dotenv.config();
 moment().format(); 
 console.log(moment().format('MMM Do, YYYY'));
 
-var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "travelexperts"
-    });
-/* con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-    var sql = "SELECT customers.CustFirstName, customers.CustLastName, bookings.BookingNo \
-    FROM customers JOIN bookings \
-    ON customers.CustomerId = bookings.CustomerId";
-    con.query(sql, function (err, result) {
-        if(err) throw err;
-        result.forEach(row => { 
-            console.log(JSON.stringify(row));
-        });
-        // console.log("Result: " + JSON.stringify(result));
-        con.end(function(err){
-            if(err) throw err;
-        })
-    })
-}); */
+app.use(session({
+    secret: 'keyboard cat',
+    cookie: {}
+}))
         
 app.set("views", path.join(__dirname, "views"));
 app.set('view engine', 'pug');
-app.listen(8000, ()=> {
-    console.log(`Server is listening on port ${port}. Ready to accept requests`);
+app.listen(process.env.PORT, ()=> {
+    console.log(`Server is listening on port ${process.env.PORT}. Ready to accept requests`);
 });
 
 app.get("/", (req, res) => {
-    res.render("index", { greetings: ["Hello", "Bonjour", "Hola", "Ciao"], title:"Index" } );
+    if (req.session.views){
+        req.session.views++;
+    } else {
+        req.session.views = 1;
+    }
+    res.render("index", { views: req.session.views, greetings: ["Hello", "Bonjour", "Hola", "Ciao"], title:"Index" } );
     });
 app.get("/home", (req, res) => {
     res.render("home", {title:"Home"});
@@ -50,48 +43,86 @@ app.get("/home", (req, res) => {
 app.get("/about", (req, res) => {
     res.render("about", {title:"About"});
 });
-app.get("/contact", (req, res) => {
-    /* con.connect(function(err) {
-        if (err) throw err;
-        console.log("Connected!");
- */        var sql = "SELECT * FROM agents";
-        con.query(sql, function (err, result) {
+app.get("/contact", (req, res) => {   
+        var sql = "SELECT * FROM users";
+        conn.query(sql, function (err, result, fields) {
             if(err) throw err;
-            // console.log("Result: " + JSON.stringify(result));
-            res.render("contact", {title:"Contact", agents: result});
-            /* con.end(function(err){
-                if(err) throw err;
-            }); */
+            const columns = fields.map(field => field.name)
+            res.render("contact", {title:"Contact", result, columns});
         })
     });
-app.get("/demo", (req, res) => {
-    res.render("demo", {title: "Demo"});
-});    
 
 app.get("/login", (req, res) => {
-    res.send("<form method='POST'><input type='text' name='username'/><input type='submit' /></form>"); 
+    res.render("login", {title: "Login"}); 
 })
 
-app.get("/create-post", (req, res) => {
-    res.render("create-post", {title: "Create Post"});
+app.get("/register", (req, res) => {
+    res.render("register", {title: "Register"});
+})
+app.get("/welcome", (req, res) => {
+    res.render("welcome", {title: "Welcome"});
 })
 
 app.post("/login", (req, res)=> {
     res.send("<h1>Login Processed</h1>");
 })
-app.use(express.urlencoded({ extended: true }));
+
 app.post("/contact", (req, res) => {
     console.log(req.body);
     res.redirect("/thank-you-for-feedback");
 });
-app.use(express.urlencoded({ extended: true }));
-app.post("/create-post", (req, res) => {
-    res.redirect("/thank-you");
+
+// below are CRUD operations for blog.
+// create
+app.post("/create-blog", (req, res) => {
+    const db = dbService.getDbServiceInstance();
+    const result = db.createBlog(req);
+    result
+    // this works but something is fishy
+        .then(data => console.log(data))
+        .catch(err => {throw(err)});
+        res.redirect("/blogPosts")
+})  
+
+// read 
+app.get("/blogPosts", (req, res) => {
+    const db = dbService.getDbServiceInstance();
+    const result = db.getAllBlogs();
+    result
+        .then(data => res.render("blogPosts", {title: "Blog Posts", data}))
+        .catch(err => {throw(err)});
+});
+    
+// update - Not Added.
+app.patch("/update", (req, res) => {
 })
 
-app.get("/thank-you", (req, res) => {
-    res.send("Thank you for your post!"); 
+// delete - Not Added.
+app.delete('/delete/:id', (request, response) => {
+    const { id } = request.params;
+    const db = dbService.getDbServiceInstance();
+
+    const result = db.deleteRowById(id);
+    
+    result
+    .then(data => response.json({success : data}))
+    .catch(err => console.log(err));
+});
+
+app.post("/register", (req, res) => {
+    console.log("Recieved user registration");
+    const db = dbService.getDbServiceInstance();
+    const result = db.createRegistration(req);
+    console.log("Registration successful");
+    res.redirect("/login")
+    });
+    
+app.post("/available", (req, res) => {
+    console.log("Username Availability Check");
+    console.log(req.body);
+    res.render("register");
 })
+
 app.get("/thank-you-for-feedback", (req, res) => {
     res.send("Thank you for your feedback!"); 
 })
@@ -100,11 +131,9 @@ app.get('/greet', (req, res) => {
     res.render(`${__dirname}/greetingsPages/${greeting.randomGreeting()}`);
   });
 
-/* app.use(express.static(__dirname + '/views/', {
-    extensions: ["html"]
-})); */
 app.use(express.static(__dirname + '/public/'));
 app.use("/img", express.static("image_assets"));
+app.use("/audio", express.static("audio_assets"));
 
 app.use((req, res, next) => {
     res.status(404).render("errorPage");

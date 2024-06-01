@@ -1,0 +1,23 @@
+extends layout.pug
+
+block content
+    form(action='/register' method='POST')
+        label(for="fldUsername") Username:
+        input(type="text" name="fldUsername")
+        button(type='button') Check Availability
+        br
+        label(for="fldPassword") Password:
+        input(type="text" name="fldPassword")
+        br
+        label(for="fldFirst") Name: 
+        input(type="text" name="fldFirst")
+        br
+        label(for="fldPhone") Phone: 
+        input(type="text" name="fldPhone")
+        br
+        label(for="fldEmail")  Email: 
+        input(type="text" name="fldEmail")
+        br
+        div
+            input(type="submit" name="fldSubmit" value="Register")
+            input(type="reset" name="fldReset" value="Clear Form")
