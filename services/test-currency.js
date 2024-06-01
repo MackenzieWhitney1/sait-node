@@ -1,4 +1,4 @@
-const currency = require("./currency");
+const currency = require("../services/currency");
 
 console.log(`50 CAD equals ${currency.canadianToUS(50)} USD.`);
 console.log(`50 USD equals ${currency.UStoCanadian(50)} CAD.`);

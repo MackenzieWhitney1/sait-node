@@ -22,10 +22,11 @@ class DbService {
     static getDbServiceInstance(){
         return instance ? instance : new DbService();
     }
-
     async getAllBlogs() {
         try {
             const response = await new Promise((resolve, reject) => {
+
+                // later on, have a page of blogs only the owner sees.
                 const sql = "SELECT * FROM blogs;";
 
                 conn.query(sql, function(err, result, fields) {
@@ -38,11 +39,28 @@ class DbService {
             throw error;
         }
     }
+    async getAllUsers() {
+        try {
+            const response = await new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM users;";
+
+                conn.query(sql, function(err, result, fields) {
+                    if(err) reject(new Error(err.message));
+                    resolve(result, fields);
+                })
+            });
+            return response;
+        } catch(error) {
+            throw error;
+        }
+    }
 
     async createBlog(req) {
         try {
             const insertID = await new Promise((resolve, reject) => {
                 const sql = "INSERT INTO blogs (blogTitle, blogPost, `userID`) VALUES (?, ?, ?);";
+
+                // Later on when sessions are better understood, use userID that's logged in 
                 const params = [req.body.blogTitle, req.body.blogPost, 1];
                 conn.query(sql, params, function(err, result, fields) {
                     if(err) reject(new Error(err.message));

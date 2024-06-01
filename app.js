@@ -7,8 +7,8 @@ const session = require("express-session");
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 const moment = require('moment');
-const greeting = require("./greetings");
-const dbService = require("./dbService");
+const greeting = require("./services/greetings");
+const dbService = require("./services/dbService");
 
 // needed so that when the API is called it will not be blocked?
 const cors = require('cors');
@@ -43,13 +43,14 @@ app.get("/home", (req, res) => {
 app.get("/about", (req, res) => {
     res.render("about", {title:"About"});
 });
-app.get("/contact", (req, res) => {   
-        var sql = "SELECT * FROM users";
-        conn.query(sql, function (err, result, fields) {
-            if(err) throw err;
-            const columns = fields.map(field => field.name)
-            res.render("contact", {title:"Contact", result, columns});
+app.get("/contact", (req, res) => {
+    const db = dbService.getDbServiceInstance();
+    const result = db.getAllUsers(req);
+    result
+        .then(data => { 
+            res.render("contact", {title:"Contact", data});
         })
+        .catch(err => {throw(err)});
     });
 
 app.get("/login", (req, res) => {
@@ -93,11 +94,11 @@ app.get("/blogPosts", (req, res) => {
         .catch(err => {throw(err)});
 });
     
-// update - Not Added.
+// update - Not Implemented!
 app.patch("/update", (req, res) => {
 })
 
-// delete - Not Added.
+// delete - Not Implemented!
 app.delete('/delete/:id', (request, response) => {
     const { id } = request.params;
     const db = dbService.getDbServiceInstance();
@@ -116,7 +117,7 @@ app.post("/register", (req, res) => {
     console.log("Registration successful");
     res.redirect("/login")
     });
-    
+
 app.post("/available", (req, res) => {
     console.log("Username Availability Check");
     console.log(req.body);
@@ -128,7 +129,7 @@ app.get("/thank-you-for-feedback", (req, res) => {
 })
 
 app.get('/greet', (req, res) => {
-    res.render(`${__dirname}/greetingsPages/${greeting.randomGreeting()}`);
+    res.render(`${__dirname}/views/greetingsPages/${greeting.randomGreeting()}`);
   });
 
 app.use(express.static(__dirname + '/public/'));
