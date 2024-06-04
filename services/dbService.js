@@ -26,7 +26,9 @@ class DbService {
         try {
             const response = await new Promise((resolve, reject) => {
 
-                // later on, have a page of blogs only the owner sees.
+                // later on, this should only show blogs of the owner.
+                // OR if there is a page that shows all blogs, don't have CRUD operations available
+                // AND if they try to add buttons with CRUD functions anyway, prevent them with server side validation
                 const sql = "SELECT * FROM blogs;";
 
                 conn.query(sql, function(err, result, fields) {
@@ -36,6 +38,7 @@ class DbService {
             });
             return response;
         } catch(error) {
+            // thrown errors aren't handled.
             throw error;
         }
     }
@@ -60,13 +63,14 @@ class DbService {
             const insertID = await new Promise((resolve, reject) => {
                 const sql = "INSERT INTO blogs (blogTitle, blogPost, `userID`) VALUES (?, ?, ?);";
 
-                // Later on when sessions are better understood, use userID that's logged in 
+                // Later on when sessions are better understood, use userID that's logged in instead of the hard coded value of 1.
                 const params = [req.body.blogTitle, req.body.blogPost, 1];
                 conn.query(sql, params, function(err, result, fields) {
                     if(err) reject(new Error(err.message));
                     resolve(result.insertID);
                 })
             });
+            // shows undefined and not the expected ID of the insert as shown in a tutorial.
             console.log(`Insert ID is: ${insertID}`);
             return insertID;
         } catch(error) {

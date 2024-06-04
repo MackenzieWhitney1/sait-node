@@ -16,9 +16,14 @@ block content
             each field in Object.keys(row)
               td= row[field]
             td 
-              button(type='submit' click='/update-blog' class="update-row-btn" data-id= row.blogID) Update
+              //- A tutorial suggested passing data-id to update and delete.
+              //- This won't work alone for multiple users who own blogs and would require more server level validation.
+              //- ie. We don't want html data-id edits to allow other users to update/delete other blogs.
+              button(type='submit' class="update-row-btn" dataId= row.blogID) Update
             td 
-              button(type='submit' click='/delete/:id' class="delete-row-btn" data-id= row.blogID) Delete
+              button(type='submit' class="delete-row-btn" dataId= row.blogID) Delete
     else 
       tr No blog posts found.
 
+block additionalScripts 
+  script(src='/services/addButtonFunctions.js')

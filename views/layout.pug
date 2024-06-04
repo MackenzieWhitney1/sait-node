@@ -5,7 +5,7 @@ html(lang="en")
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
     title Home Page
-    link#styleToChange(rel='stylesheet' href='styles.css')
+    link(rel='stylesheet' href='styles.css')
   body(onload="changeStyleByTime()")
     .topnav
       a(href='/home') Home
@@ -22,9 +22,9 @@ html(lang="en")
   script.
     function changeStyleByTime() {
     const currentHour = new Date().getHours();
-    // const currentHour = 15;
-    console.log(currentHour);
+    // if there are more classes to add/remove, a forEach would be warranted to clear existing classes, and a switch statement.
     document.body.classList.remove("morning");
     document.body.classList.remove("evening");
     document.body.classList.add(`${currentHour <= 12 ? "morning" : "evening"}`)
     }
+  block additionalScripts

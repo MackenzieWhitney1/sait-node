@@ -9,10 +9,6 @@ app.use(express.urlencoded({ extended: true }));
 const moment = require('moment');
 const greeting = require("./services/greetings");
 const dbService = require("./services/dbService");
-
-// needed so that when the API is called it will not be blocked?
-const cors = require('cors');
-app.use(cors());
 const dotenv = require('dotenv');
 dotenv.config();
 moment().format(); 
@@ -76,10 +72,12 @@ app.post("/contact", (req, res) => {
 // below are CRUD operations for blog.
 // create
 app.post("/create-blog", (req, res) => {
+    // dbService isn't necessarily required,
+    // but it does move db actions to an object with single responsibility
     const db = dbService.getDbServiceInstance();
     const result = db.createBlog(req);
     result
-    // this works but something is fishy
+    // this works but it's fishy. I would like to learn more about Promises as it seems great for error handling
         .then(data => console.log(data))
         .catch(err => {throw(err)});
         res.redirect("/blogPosts")
@@ -90,6 +88,7 @@ app.get("/blogPosts", (req, res) => {
     const db = dbService.getDbServiceInstance();
     const result = db.getAllBlogs();
     result
+        // if I want fields to return along with rows, do I need to pass a json?
         .then(data => res.render("blogPosts", {title: "Blog Posts", data}))
         .catch(err => {throw(err)});
 });
@@ -121,11 +120,14 @@ app.get("/thank-you-for-feedback", (req, res) => {
     res.send("Thank you for your feedback!"); 
 })
 
+// moved out of the path of '/' like in the original assignment
 app.get('/greet', (req, res) => {
     res.render(`${__dirname}/views/greetingsPages/${greeting.randomGreeting()}`);
   });
 
-app.use(express.static(__dirname + '/public/'));
+// either __dirname + '/public/' or "public" work.
+// if you need to be sure of the location, use abs. path.
+app.use(express.static("public"));
 app.use("/img", express.static("image_assets"));
 app.use("/audio", express.static("audio_assets"));
 
